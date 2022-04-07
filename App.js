@@ -25,6 +25,7 @@ try {
   firebase.initializeApp(firebaseConfig);
 } catch (err) {   }
 
+
 function dbListener(path,setData){
    const tb = ref(getDatabase(), path);
    onValue(tb, (snapshot)=>{
