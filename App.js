@@ -39,10 +39,7 @@ function dbListener(path, setData) {
 function renderKpop(item, index, setItem) {
   var icon = <Image style={{ width: 200, height: 150 }} source={{ uri: `https://dbkpop.com/wp-content/uploads/${item.year}/${item.number}/${item.code}.jpg` }} />
   var desc = <View style={styles.text}>
-    <Text>{"บริษัท " + item.company}</Text>
-    <Text>{"จำนวนสมาชิก " + item.members + "คน"}</Text>
-    <Text>{"ชื่อแฟนคลับ " + item.fc}</Text>
-    <Text>{"เดบิวต์ " + item.de}</Text>
+    <Text>{"จำนวนสมาชิก " + item.members + "คน"}</Text>   
   </View>;
   return <List.Item onPress={() => setItem(item)} title={item.name} description={desc} left={(props => icon)}></List.Item>
 }
@@ -54,11 +51,14 @@ function Detail(props) {
         <ScrollView>
           <Card>
           <Card.Cover source={require("./assets/Kpop.jpg")} />
-            <Card.Title title="ข้อมูลเพิ่มเติม" />
+            <Card.Title title="ข้อมูลเพิ่มเติม"/>
             <Card.Content>
-              <Text>ชื่อบริษัท: {props.item.company}</Text>
+              <Text>ชื่อวง: {props.item.name}</Text>
               <Text>จำนวนสมาชิก: {props.item.members}</Text>
-              <Text>ชื่อแฟนคลับ  {props.item.fc}</Text>              
+              <Text>ชื่อบริษัท: {props.item.company}</Text>
+              <Text>ชื่อแฟนคลับ: {props.item.fc}</Text>
+              <Text>วันเดบิวต์: {props.item.de}</Text>
+
               <Button style={{ marginTop: 100, backgroundColor: '#3700ff' }} onPress={() => props.setItem(null)}>
                 <Text style={{ color: '#ffff' }}>Back</Text>
               </Button>
