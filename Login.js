@@ -7,11 +7,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   Platform,
+  KeyboardAvoidingView
 } from 'react-native';
 import { FirebaseRecaptchaVerifierModal, FirebaseRecaptchaBanner } from 'expo-firebase-recaptcha';
 import { initializeApp, getApp } from 'firebase/app';
 import { getAuth, PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
- 
+
 export default function LoginScreen() {
   // Ref or state management hooks
   const app = getApp();
@@ -26,7 +27,7 @@ export default function LoginScreen() {
   const attemptInvisibleVerification = false;
  
   return (
-    <View style={{ padding: 20, marginTop: 50 }}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding"><View style={{ backgroundColor: '00FFFF', padding: 20, marginTop: 50 }}>
       <FirebaseRecaptchaVerifierModal
         ref={recaptchaVerifier}
         firebaseConfig={app.options}
@@ -105,7 +106,16 @@ export default function LoginScreen() {
         undefined
       )}
       {attemptInvisibleVerification && <FirebaseRecaptchaBanner />}
-    </View>
+    </View></KeyboardAvoidingView>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFC0CB',
+  },
+
+})
