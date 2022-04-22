@@ -39,7 +39,8 @@ function dbListener(path, setData) {
 function renderKpop(item, index, setItem) {
   var icon = <Image style={{ width: 200, height: 150 }} source={{ uri: `https://dbkpop.com/wp-content/uploads/${item.year}/${item.number}/${item.code}.jpg` }} />
   var desc = <View style={styles.text}>
-    <Text>{"จำนวนสมาชิก " + item.members + "คน"}</Text>   
+    <Text>{"จำนวนสมาชิก " + item.members + "คน"}</Text>  
+    <Text>{"สมาชิก " + item.detal }</Text> 
   </View>;
   return <List.Item onPress={() => setItem(item)} title={item.name} description={desc} left={(props => icon)}></List.Item>
 }
