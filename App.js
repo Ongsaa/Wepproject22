@@ -5,7 +5,9 @@ import firebase from 'firebase/compat/app';
 import { getDatabase, ref, onValue, set } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 import { Provider as PaperProvider, Card, List, Button } from 'react-native-paper';
-import { initializeApp } from "firebase/app";
+// import { initializeApp } from "firebase/app";
+import Constants from 'expo-constants';
+import LoginScreen from './Login';
 
 
 const firebaseConfig = {
@@ -20,83 +22,110 @@ const firebaseConfig = {
 };
 
 LogBox.ignoreAllLogs(true);
- 
+
 try {
   firebase.initializeApp(firebaseConfig);
-} catch (err) {   }
+} catch (err) { }
 
 
-function dbListener(path,setData){
-   const tb = ref(getDatabase(), path);
-   onValue(tb, (snapshot)=>{
-     setData(snapshot.val());
-   })
+function dbListener(path, setData) {
+  const tb = ref(getDatabase(), path);
+  onValue(tb, (snapshot) => {
+    setData(snapshot.val());
+  })
 }
 
 
-function renderKpop({item}){
-  
-  var icon = <Image style={{width:200,height:150}}
-  source={{uri:`https://dbkpop.com/wp-content/uploads/${item.year}/${item.number}/${item.code}.jpg`}}/>   
+function renderKpop(item, index, setItem) {
+  var icon = <Image style={{ width: 200, height: 150 }} source={{ uri: `https://dbkpop.com/wp-content/uploads/${item.year}/${item.number}/${item.code}.jpg` }} />
   var desc = <View style={styles.text}>
-  <Text>{ "บริษัท "+item.company}</Text>
-  <Text>{ "จำนวนสมาชิก "+item.members+"คน"}</Text>
-  <Text>{ "ชื่อแฟนคลับ "+item.fc}</Text>
-  <Text>{ "เดบิวต์ "+item.de}</Text>
-
-  <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate('mem')}>
-          <Text>Details</Text>
-  </TouchableOpacity>   
+    <Text>{"บริษัท " + item.company}</Text>
+    <Text>{"จำนวนสมาชิก " + item.members + "คน"}</Text>
+    <Text>{"ชื่อแฟนคลับ " + item.fc}</Text>
+    <Text>{"เดบิวต์ " + item.de}</Text>
   </View>;
-   return <List.Item  title={item.name} description={desc}  left={(props=>icon)}></List.Item>  
+  return <List.Item onPress={() => setItem(item)} title={item.name} description={desc} left={(props => icon)}></List.Item>
 }
 
-function Loading(){
+function Detail(props) {
+  return (
+    <PaperProvider>
+      <View style={styles.container}>
+        <ScrollView>
+          <Card>
+          <Card.Cover source={require("./assets/Kpop.jpg")} />
+            <Card.Title title="ข้อมูลเพิ่มเติม" />
+            <Card.Content>
+              <Text>ชื่อบริษัท: {props.item.company}</Text>
+              <Text>จำนวนสมาชิก: {props.item.members}</Text>
+              <Text>ชื่อแฟนคลับ  {props.item.fc}</Text>              
+              <Button style={{ marginTop: 100, backgroundColor: '#3700ff' }} onPress={() => props.setItem(null)}>
+                <Text style={{ color: '#ffff' }}>Back</Text>
+              </Button>
+            </Card.Content>
+          </Card>
+        </ScrollView>
+      </View>
+    </PaperProvider>
+  );
+};
+
+function Loading() {
   return <View><Text>Loading</Text></View>
 }
 export default function App() {
   const [kpop, setKpop] = React.useState([]);
   const [user, setUser] = React.useState(null);
-  
+  const [citem, setCitem] = React.useState(null);
+
   React.useEffect(() => {
     var auth = getAuth();
     auth.onAuthStateChanged(function (us) {
       setUser(us);
     });
     dbListener("/kpop", setKpop);
-   }, []);
-   if(kpop.length==0){
-    return <Loading/>;
+  }, []);
+  if (user == null) {
+    return <LoginScreen />;
+  } 
+  if (kpop.length == 0) {
+    return <Loading />;
+  } 
+
+  if (citem != null) {
+    return <Detail item={citem} setItem={setCitem} />;
   }
-  
+
   return (
-    <PaperProvider> 
-    <View style={styles.container}>
-    <Card.Cover source={require("./assets/Kpop.jpg")}/>
-      <ScrollView>
-        <Card>
-        <Card.Title title="K-pop Idols Groups"/>
-        <Card.Content>
-        <FlatList data={kpop} renderItem={renderKpop} ></FlatList>
-        </Card.Content>
-        </Card>
-        
+    <PaperProvider>
+      <View style={styles.container}>
+        <Card.Cover source={require("./assets/Kpop.jpg")} />
+        <ScrollView>
+          <Card>
+            <Card.Title title="K-pop Idols Groups" />
+            <Card.Content>
+            {/* <FlatList data={kpop} renderItem={renderKpop} ></FlatList> */}
+              <FlatList data={kpop} 
+              renderItem={({ item, index }) => renderKpop(item, index, setCitem)} >
+              </FlatList>
+            </Card.Content>
+          </Card>
         </ScrollView>
-        
-      <StatusBar style="auto" />
+        <Button icon="logout" mode="contained" onPress={() => getAuth().signOut()}>
+          Sign Out
+        </Button>
+        <StatusBar backgroundColor="rgba(0,0,0,0.5)" style="light" />
       </View>
-      
     </PaperProvider>
   );
 }
- 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5E3CB'
   },
-  text:{
-  padding:15,
+  text: {
+    padding: 15,
   },
   button: {
     backgroundColor: '#9292D1',
@@ -104,11 +133,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 20,
     shadowColor: '#303838',
-    shadowOffset: { width:0, height: 5 },
+    shadowOffset: { width: 0, height: 5 },
     shadowRadius: 10,
     shadowOpacity: 0.35,
     alignItems: 'center',
     color: '#9292D1',
   },
 });
-
